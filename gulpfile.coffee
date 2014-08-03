@@ -1,16 +1,14 @@
 gulp = require 'gulp'
 gp = do require "gulp-load-plugins"
 
-spawn = require("child_process").spawn
 streamqueue = require 'streamqueue'
 combine = require 'stream-combiner'
 
 #p = require 'path'
 
 # ==========================
-# TODO: only runs @ root, should run anywhere in proj dir
 
-destPath = './public/dist'
+destPath = './dist'
 
 htmlminOptions =
   removeComments: true
@@ -26,50 +24,54 @@ htmlminOptions =
 
 # ==========================
 
+# dev & prod use
 gulp.task 'css', ->
-  gulp.src './public/css/b-app.less'
+  gulp.src './src/css/b-app.less'
     # TODO: wait for minifyCss to support sourcemaps
 #    .pipe gp.sourcemaps.init()
     # TODO: switch out font-awesome woff path w/ CDN path
     # .pipe replace "../bower_components/font-awesome/fonts", "//cdn.jsdelivr.net/fontawesome/4.1.0/fonts"
-    .pipe gp.less paths: './public/b-*/b-*.less' # @import path
+    .pipe gp.less paths: './src/b-*/b-*.less' # @import path
     .pipe gp.minifyCss cache: true, keepSpecialComments: 0 # remove all
 #    .pipe gp.sourcemaps.write './'
     .pipe gulp.dest destPath
 
-gulp.task 'html', ->
-  gulp.src ['./public/index.html']
+gulp.task 'html-prod', ->
+  gulp.src ['./src/index.html']
 #    .pipe gp.replace "ng-app", "ng-app ng-strict-di"
     .pipe gp.htmlReplace
-      js: 'b-app.js'
-      css: 'b-app.css'
-    .pipe gp.replace 'dist/', ''
+      css: 'dist/b-app.css'
+      js: 'dist/b-app.js'
+    .pipe gp.replace '../dist/favicon.ico', 'dist/favicon.ico' # for b-map.coffee loading topojson
     .pipe gp.htmlmin htmlminOptions
-    .pipe gulp.dest destPath
+    .pipe gulp.dest './'
 
-gulp.task 'js', ->
+gulp.task 'js-dev', ->
+  gulp.src ['./src/b-*/b-*.coffee', './src/js**/b-*.coffee'] # js** glob to force output to same subdir
+    .pipe gp.plumber()
+    .pipe gp.coffee()
+    .pipe gp.ngAnnotate() # ngmin doesn't annotate coffeescript wrapped code
+    .pipe gulp.dest './src'
+
+gulp.task 'js-prod', ->
   # inline templates
-  ngTemplates = gulp.src './public/b-*/b-*.html'
+  ngTemplates = gulp.src './src/b-*/b-*.html'
     .pipe gp.htmlmin htmlminOptions
     .pipe gp.angularTemplatecache module: 'B.Templates', standalone: true # annotated already
 
   # compile cs & annotate for min
-  ngModules = gulp.src ['./public/b-*/b-*.coffee', './public/js/b-app.coffee']
+  ngModules = gulp.src ['./src/b-*/b-*.coffee', './src/js**/b-*.coffee']
     .pipe gp.plumber()
-    .pipe gp.replace 'dist/', '' # for b-map.coffee loading topojson
+    .pipe gp.replace '../dist/', 'dist/' # for b-map.coffee loading topojson
     .pipe gp.replace "# 'B.Templates'", "'B.Templates'" # for b-app.coffee $templateCache
     .pipe gp.coffee()
     .pipe gp.ngAnnotate() # ngmin doesn't annotate coffeescript wrapped code
 
-  # compile cs for functional js files
-  gulp.src ['./public/b-*/b-*.coffee']
-    .pipe gp.plumber()
-    .pipe gp.coffee()
-    .pipe gp.ngAnnotate() # ngmin doesn't annotate coffeescript wrapped code
-    .pipe gulp.dest './public'
-
   # src that need min
-  otherSrc = ['./public/bower_components/topojson/topojson.js', './public/bower_components/plottable/plottable.js']
+  otherSrc = [
+    './src/bower_components/topojson/topojson.js'
+    './src/bower_components/plottable/plottable.js'
+  ]
   other = gulp.src otherSrc
 
   # min above
@@ -78,38 +80,42 @@ gulp.task 'js', ->
 
   # src already min
   otherMinSrc = [
-    './public/bower_components/angular/angular.min.js'
-    './public/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js'
-    './public/bower_components/d3/d3.min.js'
+    './src/bower_components/angular/angular.min.js'
+    './src/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js'
+    './src/bower_components/d3/d3.min.js'
   ] # order is respected
   otherMin = gulp.src otherMinSrc
 
   # concat
-  streamqueue objectMode: true, otherMin, min # other 1st b/c has angular
+  streamqueue objectMode: true, otherMin, min # otherMin 1st b/c has angular
     .pipe gp.concat 'b-app.js'
     .pipe gulp.dest destPath
 
-#gulp.task 'server', -> spawn 'bash', ['./scripts/start.sh'], {stdio: 'inherit'} # node-dev
-gulp.task 'server', -> spawn 'foreman', ['start'], {stdio: 'inherit'} # foreman
-gulp.task 'redis', -> spawn 'redis-server', ['./scripts/redis.conf'], {stdio: 'inherit'}
+gulp.task 'server', ->
+  gulp.src('./').pipe gp.webserver(
+    fallback: 'index.html'
+    port: 3000
+  )
 
 # ==========================
 
-gulp.task 'dev', ->
-  gulp.src ['./public/b-*/b-*.less', './public/css/b-app.less']
+gulp.task 'watch', ->
+  gulp.src ['./src/b-*/b-*.less', './src/css/b-app.less']
     .pipe gp.watch {emit: 'one', name: 'css'}, ['css']
 
   jsSrc = [
-    './public/b-*/b-*.coffee', './public/js/b-app.coffee'
-    './public/b-*/b-*.html'
-    # './public/bower_components/**/*.js'
+    './src/b-*/b-*.coffee', './src/js**/b-*.coffee'
+    './src/b-*/b-*.html'
+    # './src/bower_components/**/*.js'
     # TODO: gulp watch can't see files added after bower install unless using glob option
   ]
-  gulp.src(jsSrc).pipe gp.watch {emit: 'one', name: 'js'}, ['js']
+  gulp.src(jsSrc).pipe gp.watch {emit: 'one', name: 'js'}, ['js-dev']
 
-  gulp.src ['./public/index.html']
-    .pipe gp.watch {emit: 'one', name: 'html'}, ['html']
+#  gulp.src ['./src/index.html']
+#    .pipe gp.watch {emit: 'one', name: 'html'}, ['html-prod']
 
-gulp.task 'prod', ['css', 'js', 'html']
+gulp.task 'dev', ['watch', 'server'], ->
+  console.info "Please browse to http://localhost:3000/src"; return
 
-gulp.task 'default', ['dev', 'redis', 'server']
+gulp.task 'prod', ['css', 'js-prod', 'html-prod', 'server'], ->
+  console.info "Please browse to http://localhost:3000"; return
