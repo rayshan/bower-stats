@@ -52,3 +52,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=../js/b-app.js.map

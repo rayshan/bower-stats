@@ -55,3 +55,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=../b-table-pkgs/b-table-pkgs.js.map

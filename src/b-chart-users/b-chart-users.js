@@ -107,3 +107,5 @@
   }]);
 
 }).call(this);
+
+//# sourceMappingURL=../b-chart-users/b-chart-users.js.map

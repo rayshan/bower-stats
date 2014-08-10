@@ -23,3 +23,5 @@
   }]);
 
 }).call(this);
+
+//# sourceMappingURL=../b-table-cmds/b-table-cmds.js.map
