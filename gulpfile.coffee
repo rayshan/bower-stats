@@ -8,7 +8,7 @@ combine = require 'stream-combiner'
 
 # ==========================
 
-destPath = './dist'
+distPath = './dist'
 
 htmlminOptions =
   removeComments: true
@@ -34,7 +34,7 @@ gulp.task 'css', ->
     .pipe gp.less paths: './src/b-*/b-*.less' # @import path
     .pipe gp.minifyCss cache: true, keepSpecialComments: 0 # remove all
 #    .pipe gp.sourcemaps.write './'
-    .pipe gulp.dest destPath
+    .pipe gulp.dest distPath
 
 gulp.task 'html-prod', ->
   gulp.src ['./src/index.html']
@@ -44,13 +44,15 @@ gulp.task 'html-prod', ->
       js: 'dist/b-app.js'
     .pipe gp.replace '../dist/favicon.ico', 'dist/favicon.ico' # for b-map.coffee loading topojson
     .pipe gp.htmlmin htmlminOptions
-    .pipe gulp.dest './'
+    .pipe gulp.dest './' # to root for gh-pages use
 
 gulp.task 'js-dev', ->
   gulp.src ['./src/b-*/b-*.coffee', './src/js**/b-*.coffee'] # js** glob to force output to same subdir
     .pipe gp.plumber()
+    .pipe gp.sourcemaps.init()
     .pipe gp.coffee()
     .pipe gp.ngAnnotate() # ngmin doesn't annotate coffeescript wrapped code
+    .pipe gp.sourcemaps.write('./')
     .pipe gulp.dest './src'
 
 gulp.task 'js-prod', ->
@@ -89,7 +91,7 @@ gulp.task 'js-prod', ->
   # concat
   streamqueue objectMode: true, otherMin, min # otherMin 1st b/c has angular
     .pipe gp.concat 'b-app.js'
-    .pipe gulp.dest destPath
+    .pipe gulp.dest distPath
 
 gulp.task 'server', ->
   gulp.src('./').pipe gp.webserver(
