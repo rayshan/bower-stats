@@ -62,7 +62,7 @@
       compile: function() {
         var render;
         render = function(data) {
-          var addY, area_existing, area_new, center, chart, colorScale, domainer, existingUsersData, format, gridlines, installsLabel, legend, line_installs, newUsersData, npmData, stack, stackedData, usersLabel, xAxis, xScale, yAxisInstalls, yAxisUsers, yScaleInstalls, yScaleUsers;
+          var center, chart, colorScale, domainer, existingUsersData, format, gridlines, installsLabel, legend, line_installs, newUsersData, npmData, stack, stackedAreaPlot_users, stackedData, usersLabel, xAxis, xScale, yAxisInstalls, yAxisUsers, yScaleInstalls, yScaleUsers;
           stack = d3.layout.stack().values(function(d) {
             return d;
           }).x(function(d) {
@@ -92,13 +92,17 @@
           legend = new Plottable.Component.Legend(colorScale).xAlign("left");
           usersLabel = new Plottable.Component.AxisLabel("Daily Active Users", "left");
           installsLabel = new Plottable.Component.AxisLabel("Daily npm Installs", "left");
-          addY = function(d) {
-            return d.y0 + d.y;
-          };
-          area_existing = (new Plottable.Plot.Area(existingUsersData, xScale, yScaleUsers)).project("x", "date", xScale).project("y0", "y0", yScaleUsers).project("y", addY, yScaleUsers).classed("existing-users", true);
-          area_new = (new Plottable.Plot.Area(newUsersData, xScale, yScaleUsers)).project("x", "date", xScale).project("y0", "y0", yScaleUsers).project("y", addY, yScaleUsers).classed("new-users", true);
+          stackedAreaPlot_users = new Plottable.Plot.StackedArea(xScale, yScaleUsers);
+          stackedAreaPlot_users.addDataset("existing", existingUsersData).addDataset("new", newUsersData).project("fill", (function(d) {
+            if (d.key === 'N') {
+              return 1;
+            } else {
+              return 2;
+            }
+          }), colorScale);
+          stackedAreaPlot_users.project("x", "date", xScale).project("y0", "y0", yScaleUsers);
           line_installs = (new Plottable.Plot.Line(npmData, xScale, yScaleInstalls)).project("x", "date", xScale).project("y", "movingAvg", yScaleInstalls).classed("npm-installs", true);
-          center = area_existing.merge(area_new).merge(line_installs).merge(gridlines).merge(legend);
+          center = stackedAreaPlot_users.merge(line_installs).merge(gridlines).merge(legend);
           chart = new Plottable.Component.Table([[usersLabel, yAxisUsers, center, yAxisInstalls, installsLabel], [null, null, xAxis, null, null]]).renderTo("#users-chart");
         };
         bChartUserDataSvc.then(render);
