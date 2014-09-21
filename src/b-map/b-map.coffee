@@ -54,10 +54,10 @@ module.factory 'bMapDataSvc', ($filter, $q, d3map, topojson, bDataSvc, bTopojson
       .range ["#00acee", "#EF5734"]
     radiusUsers = d3map.scale.sqrt()
       .domain [2, maxUsers]
-      .range [2, 55]
+      .range [2, 50]
     radiusDensity = d3map.scale.sqrt()
       .domain [minDensity, maxDensity]
-      .range [2, 55]
+      .range [2, 40]
 
     topo = topojson.feature topojsonData, topojsonData.objects.countries
     countryDataTopo = topo.features
