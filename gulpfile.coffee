@@ -95,7 +95,7 @@ gulp.task 'js-prod', ->
 
 gulp.task 'server', ->
   gulp.src('./').pipe gp.webserver(
-    fallback: 'index.html'
+    fallback: 'index.html' # for angular html5mode
     port: 3000
   )
 

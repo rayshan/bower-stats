@@ -14,22 +14,3 @@ build
 
 node_modules
 bower_components
-
-# redis db dump
-*.rdb
-
-# contains api secrets & tokens
-dev.sh
-
-# pm2 conf, contains api secrets & tokens, need manual upload
-processes.json
-
-# contains newrelic license key
-newrelic.js
-
-# foreman dev env var, contains API keys & secrets
-.env
-
-# keys (e.g. for GA service account)
-*.p12
-*.pem
