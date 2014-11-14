@@ -3,7 +3,7 @@
 
   module = angular.module('B.Delta', []);
 
-  module.directive("bDelta", ["bDataSvc", function(bDataSvc) {
+  module.directive("bDelta", function(bDataSvc) {
     return {
       templateUrl: 'b-delta/b-delta.html',
       restrict: 'E',
@@ -12,7 +12,7 @@
         type: "@"
       }
     };
-  }]);
+  });
 
   module.filter('pct', function() {
     return function(input) {

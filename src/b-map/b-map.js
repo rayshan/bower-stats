@@ -7,11 +7,11 @@
     return topojson;
   });
 
-  module.factory('bTopojsonSvc', ["$http", function($http) {
+  module.factory('bTopojsonSvc', function($http) {
     return $http.get('../dist/ne_110m_admin_0_countries_topojson.json');
-  }]);
+  });
 
-  module.factory('d3map', ["d3", function(d3) {
+  module.factory('d3map', function(d3) {
     d3.collision = function(alpha, nodes, radiusKey, bubblePadding, w, h) {
       var quadtree;
       radiusKey = 'r' + radiusKey;
@@ -43,9 +43,9 @@
       };
     };
     return d3;
-  }]);
+  });
 
-  module.factory('bMapDataSvc', ["$filter", "$q", "d3map", "topojson", "bDataSvc", "bTopojsonSvc", function($filter, $q, d3map, topojson, bDataSvc, bTopojsonSvc) {
+  module.factory('bMapDataSvc', function($filter, $q, d3map, topojson, bDataSvc, bTopojsonSvc) {
     var parseData;
     parseData = function(data) {
       var colorsDensity, colorsUsers, countryData, countryDataTopo, maxDensity, maxUsers, minDensity, radiusDensity, radiusUsers, topo, topojsonData, _deferred;
@@ -92,9 +92,9 @@
       return _deferred.promise;
     };
     return $q.all([bDataSvc.fetchAllP, bTopojsonSvc]).then(parseData);
-  }]);
+  });
 
-  module.directive("bMap", ["d3map", "topojson", "bMapDataSvc", "$window", function(d3map, topojson, bMapDataSvc, $window) {
+  module.directive("bMap", function(d3map, topojson, bMapDataSvc, $window) {
     return {
       templateUrl: 'b-map/b-map.html',
       restrict: 'E',
@@ -237,7 +237,7 @@
         bMapDataSvc.then(render);
       }
     };
-  }]);
+  });
 
 }).call(this);
 

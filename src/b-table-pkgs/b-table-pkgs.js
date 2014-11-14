@@ -3,7 +3,7 @@
 
   module = angular.module('B.Table.Pkgs', []);
 
-  module.directive("bTablePkgs", ["bDataSvc", "bPoP", function(bDataSvc, bPoP) {
+  module.directive("bTablePkgs", function(bDataSvc, bPoP) {
     return {
       templateUrl: 'b-table-pkgs/b-table-pkgs.html',
       restrict: 'E',
@@ -36,7 +36,7 @@
         };
       }
     };
-  }]);
+  });
 
   module.filter('bPredicateFilter', function() {
     return function(items, predicate) {

@@ -3,11 +3,11 @@
 
   app = angular.module('BApp', ['B.Chart.Users', 'B.Table.Cmds', 'B.Table.Pkgs', 'B.Map', 'B.Delta', 'ui.bootstrap']);
 
-  app.factory('bDataSvc', ["$http", function($http) {
+  app.factory('bDataSvc', function($http) {
     return {
       fetchAllP: $http.get("https://bower-server-etl.herokuapp.com/api/1/data/all")
     };
-  }]);
+  });
 
   app.factory('bPoP', function() {
     var _reduceFunc;
@@ -31,13 +31,13 @@
     return d3;
   });
 
-  app.controller('BHeaderCtrl', ["bDataSvc", function(bDataSvc) {
+  app.controller('BHeaderCtrl', function(bDataSvc) {
     bDataSvc.fetchAllP.then((function(_this) {
       return function(data) {
         _this.pkgs = data.data.overview.totalPackages;
       };
     })(this));
-  }]);
+  });
 
   app.filter('round', function() {
     return function(input, decimals) {

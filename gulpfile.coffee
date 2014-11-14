@@ -51,8 +51,7 @@ gulp.task 'js-dev', ->
     .pipe gp.plumber()
     .pipe gp.sourcemaps.init()
     .pipe gp.coffee()
-    .pipe gp.ngAnnotate() # ngmin doesn't annotate coffeescript wrapped code
-    .pipe gp.sourcemaps.write('./')
+    .pipe gp.sourcemaps.write './'
     .pipe gulp.dest './src'
 
 gulp.task 'js-prod', ->
@@ -111,13 +110,12 @@ gulp.task 'watch', ->
     # './src/bower_components/**/*.js'
     # TODO: gulp watch can't see files added after bower install unless using glob option
   ]
-  gulp.src(jsSrc).pipe gp.watch {emit: 'one', name: 'js'}, ['js-dev']
+  gulp.src jsSrc
+    .pipe gp.watch {emit: 'one', name: 'js'}, ['js-dev']
 
 #  gulp.src ['./src/index.html']
 #    .pipe gp.watch {emit: 'one', name: 'html'}, ['html-prod']
 
 gulp.task 'dev', ['watch', 'server'], ->
-  console.info "Please browse to http://localhost:3000/src"; return
 
 gulp.task 'prod', ['css', 'js-prod', 'html-prod', 'server'], ->
-  console.info "Please browse to http://localhost:3000"; return

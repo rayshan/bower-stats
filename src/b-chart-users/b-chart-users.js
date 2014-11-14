@@ -3,7 +3,7 @@
 
   module = angular.module('B.Chart.Users', []);
 
-  module.service('bChartUserDataSvc', ["$q", "bDataSvc", "d3", function($q, bDataSvc, d3) {
+  module.service('bChartUserDataSvc', function($q, bDataSvc, d3) {
     var movingAverage, parseArray, parseData;
     parseArray = function(dataArr) {
       var mAvg, parseDate;
@@ -53,9 +53,9 @@
       return out;
     };
     return bDataSvc.fetchAllP.then(parseData);
-  }]);
+  });
 
-  module.directive("bChartUsers", ["d3", "bChartUserDataSvc", function(d3, bChartUserDataSvc) {
+  module.directive("bChartUsers", function(d3, bChartUserDataSvc) {
     return {
       templateUrl: 'b-chart-users/b-chart-users.html',
       restrict: 'E',
@@ -108,7 +108,7 @@
         bChartUserDataSvc.then(render);
       }
     };
-  }]);
+  });
 
 }).call(this);
 

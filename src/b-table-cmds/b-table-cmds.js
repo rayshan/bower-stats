@@ -3,7 +3,7 @@
 
   module = angular.module('B.Table.Cmds', []);
 
-  module.directive("bTableCmds", ["bDataSvc", "bPoP", function(bDataSvc, bPoP) {
+  module.directive("bTableCmds", function(bDataSvc, bPoP) {
     return {
       templateUrl: 'b-table-cmds/b-table-cmds.html',
       restrict: 'E',
@@ -20,7 +20,7 @@
         });
       }
     };
-  }]);
+  });
 
 }).call(this);
 
