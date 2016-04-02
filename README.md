@@ -8,6 +8,10 @@ https://github.com/bower/bower/issues/1164#issuecomment-38207751
 
 v2 & beyond planning done in this repo's issues.
 
+## Screenshot
+
+![bower-stats screenshot](screenshot.png?raw=true "bower-stats screenshot")
+
 ## Development
 
 System Dependencies - Node.js
