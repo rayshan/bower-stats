@@ -10,7 +10,7 @@ v2 & beyond planning done in this repo's issues.
 
 ## Screenshot
 
-![bower-stats screenshot](screenshot.png?raw=true "bower-stats screenshot")
+![bower-stats screenshot](screenshot_small.png?raw=true "bower-stats screenshot")
 
 ## Development
 
